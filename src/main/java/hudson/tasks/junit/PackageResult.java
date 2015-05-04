@@ -142,6 +142,21 @@ public final class PackageResult extends MetaTabulatedResult implements Comparab
         return skipCount;
     }
 
+    @Exported(visibility=999)
+    public int getFailedUnwaivedCount() {
+        return getFailedUnwaivedTests().size();
+    }
+
+    @Exported(visibility=999)
+    public int getSkippedUnwaivedCount() {
+        return getSkippedUnwaivedTests().size();
+    }
+
+    @Exported(visibility=999)
+    public int getWaivedCount() {
+        return getWaivedTests().size();
+    }
+
     @Override
     public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
         ClassResult result = getClassResult(name);
@@ -186,6 +201,41 @@ public final class PackageResult extends MetaTabulatedResult implements Comparab
         return r;
     }
 
+    public List<CaseResult> getFailedUnwaivedTests() {
+        List<CaseResult> r = new ArrayList<CaseResult>();
+        for (ClassResult clr : classes.values()) {
+            for (CaseResult cr : clr.getChildren()) {
+                if (cr.isFailed() && !cr.isWaived()) {
+                    r.add(cr);
+                }
+            }
+        }
+        return r;
+    }
+
+    public List<CaseResult> getSkippedUnwaivedTests() {
+        List<CaseResult> r = new ArrayList<CaseResult>();
+        for (ClassResult clr : classes.values()) {
+            for (CaseResult cr : clr.getChildren()) {
+                if (cr.isSkipped() && !cr.isWaived()) {
+                    r.add(cr);
+                }
+            }
+        }
+        return r;
+    }
+
+    public List<CaseResult> getWaivedTests() {
+        List<CaseResult> r = new ArrayList<CaseResult>();
+        for (ClassResult clr : classes.values()) {
+            for (CaseResult cr : clr.getChildren()) {
+                if (cr.isWaived()) {
+                    r.add(cr);
+                }
+            }
+        }
+        return r;
+    }
     /**
      * Returns a list of the failed cases, sorted by age.
      */

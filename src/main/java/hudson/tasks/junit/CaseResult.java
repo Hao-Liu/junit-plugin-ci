@@ -67,6 +67,8 @@ public class CaseResult extends TestResult implements Comparable<CaseResult> {
     private transient String safeName;
     private final boolean skipped;
     private final String skippedMessage;
+    private final String waive;
+    private final String summary;
     private final String errorStackTrace;
     private final String errorDetails;
     private transient SuiteResult parent;
@@ -135,6 +137,8 @@ public class CaseResult extends TestResult implements Comparable<CaseResult> {
         errorDetails = getErrorMessage(testCase);
         this.parent = parent;
         duration = parseTime(testCase);
+        waive = getWaiveMessage(testCase);
+        summary = getSummaryMessage(testCase);
         skipped = isMarkedAsSkipped(testCase);
         skippedMessage = getSkippedMessage(testCase);
         @SuppressWarnings("LeakingThisInConstructor")
@@ -212,6 +216,8 @@ public class CaseResult extends TestResult implements Comparable<CaseResult> {
         this.testName = testName;
         this.errorStackTrace = errorStackTrace;
         this.errorDetails = "";
+        this.waive = null;
+        this.summary = null;
         this.parent = parent;
         this.stdout = null;
         this.stderr = null;
@@ -244,6 +250,13 @@ public class CaseResult extends TestResult implements Comparable<CaseResult> {
         return msg.attributeValue("message");
     }
 
+    private static String getWaiveMessage(Element testCase) {
+        return testCase.elementText("waive");
+    }
+
+    private static String getSummaryMessage(Element testCase) {
+        return testCase.elementText("summary");
+    }
     /**
      * If the testCase element includes the skipped element (as output by TestNG), then
      * the test has neither passed nor failed, it was never run.
@@ -513,6 +526,15 @@ public class CaseResult extends TestResult implements Comparable<CaseResult> {
         return errorDetails;
     }
 
+    @Exported
+    public String getWaive() {
+        return waive;
+    }
+
+    @Exported
+    public String getSummary() {
+        return summary;
+    }
     /**
      * @return true if the test was not skipped and did not fail, false otherwise.
      */
@@ -539,6 +561,9 @@ public class CaseResult extends TestResult implements Comparable<CaseResult> {
         return !isPassed() && !isSkipped();
     }
 
+    public boolean isWaived() {
+        return waive != null;
+    }
     /**
      * Provides the reason given for the test being being skipped.
      * @return the message given for a skipped test if one has been provided, null otherwise.

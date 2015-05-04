@@ -378,14 +378,27 @@ public final class TestResult extends MetaTabulatedResult {
     }
 
     @Exported(visibility=999)
+    public int getFailedUnwaivedCount() {
+        return getFailedUnwaivedTests().size();
+    }
+
+    @Exported(visibility=999)
+    public int getSkippedUnwaivedCount() {
+        return getSkippedUnwaivedTests().size();
+    }
+
+    @Exported(visibility=999)
+    public int getWaivedCount() {
+        return getWaivedTests().size();
+    }
+    @Exported(visibility=999)
     @Override
     public int getFailCount() {
         if(failedTests==null)
             return 0;
         else
-        return failedTests.size();
+            return failedTests.size();
     }
-
     @Exported(visibility=999)
     @Override
     public int getSkipCount() {
@@ -406,6 +419,40 @@ public final class TestResult extends MetaTabulatedResult {
         return failedTests;
     }
 
+    public List<CaseResult> getFailedUnwaivedTests() {
+        List<CaseResult> tests = new ArrayList<CaseResult>();
+        for (CaseResult test: failedTests) {
+            if (!test.isWaived()) {
+                tests.add(test);
+            }
+        }
+        return tests;
+    }
+
+    public List<CaseResult> getSkippedUnwaivedTests() {
+        List<CaseResult> tests = new ArrayList<CaseResult>();
+        for(SuiteResult s : suites) {
+            for(CaseResult cr : s.getCases()) {
+                if(cr.isSkipped() && !cr.isWaived()) {
+                    tests.add(cr);
+                }
+            }
+        }
+        return tests;
+    }
+
+    public List<CaseResult> getWaivedTests() {
+        List<CaseResult> tests = new ArrayList<CaseResult>();
+
+        for(SuiteResult s : suites) {
+            for(CaseResult cr : s.getCases()) {
+                if(cr.isWaived()) {
+                    tests.add(cr);
+                }
+            }
+        }
+        return tests;
+    }
     /**
      * Gets the "children" of this test result that passed
      *

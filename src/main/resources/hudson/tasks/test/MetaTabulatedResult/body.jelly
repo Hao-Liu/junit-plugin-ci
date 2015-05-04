@@ -25,17 +25,19 @@ THE SOFTWARE.
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson/test" xmlns:f="/lib/form">
-  <j:if test="${it.failCount!=0}">
-    <h2>${%All Failed Tests}</h2>
+  <j:if test="${it.failedUnwaivedCount!=0}">
+    <h2>${%Failed Tests}</h2>
     <table class="pane sortable bigtable">
       <tr>
         <td class="pane-header">${%Test Name}</td>
         <td class="pane-header" style="width:4em">${%Duration}</td>
         <td class="pane-header" style="width:3em">${%Age}</td>
       </tr>
-      <j:forEach var="f" items="${it.failedTests}" varStatus="i">
+      <j:forEach var="f" items="${it.failedUnwaivedTests}" varStatus="i">
         <tr>
-          <td class="pane"><t:failed-test result="${f}" url="${f.getRelativePathFrom(it)}"/></td>
+          <td class="pane"><t:failed-test result="${f}" url="${f.getRelativePathFrom(it)}"/>
+              <p style="margin: 0; margin-left: 2em">${f.summary}</p>
+          </td>
           <td class="pane" style="text-align:right;" data="${f.duration}">
             ${f.durationString}
           </td>
@@ -46,6 +48,60 @@ THE SOFTWARE.
       </j:forEach>
     </table>
   </j:if>
+    <j:if test="${it.skippedUnwaivedCount!=0}">
+        <h2>${%Skipped Tests}</h2>
+        <table class="pane sortable bigtable">
+            <tr>
+                <td class="pane-header">${%Test Name}</td>
+                <td class="pane-header" style="width:4em">${%Duration}</td>
+                <td class="pane-header" style="width:3em">${%Age}</td>
+            </tr>
+            <j:forEach var="f" items="${it.skippedUnwaivedTests}" varStatus="i">
+                <tr>
+                    <td class="pane"><t:failed-test result="${f}" url="${f.getRelativePathFrom(it)}"/>
+                        <p style="margin: 0; margin-left: 2em">${f.summary}</p>
+                    </td>
+                    <td class="pane" style="text-align:right;" data="${f.duration}">
+                        ${f.durationString}
+                    </td>
+                    <td class="pane" style="text-align:right;">
+                        <a href="${rootURL}/${f.failedSinceRun.url}" class="model-link inside">${f.age}</a>
+                    </td>
+                </tr>
+            </j:forEach>
+        </table>
+    </j:if>
+
+    <j:if test="${it.WaivedCount!=0}">
+        <h2>${%Waived Tests}</h2>
+        <table class="pane sortable bigtable">
+            <tr>
+                <td class="pane-header">${%Test Name}</td>
+                <td class="pane-header" style="width:15em">${%Reason}</td>
+                <td class="pane-header" style="width:4em">${%Result}</td>
+                <td class="pane-header" style="width:3em">${%Age}</td>
+            </tr>
+            <j:forEach var="f" items="${it.WaivedTests}" varStatus="i">
+                <tr>
+                    <td class="pane"><t:failed-test result="${f}" url="${f.getRelativePathFrom(it)}"/>
+                        <p style="margin: 0; margin-left: 2em">${f.summary}</p>
+                    </td>
+                    <td class="pane" style="text-align:right;" data="${f.waive}">
+                        ${f.waive}
+                    </td>
+                    <td class="pane" style="width:6em">
+                        <j:set var="pst" value="${f.status}" />
+                        <span class="${pst.cssClass}">
+                            ${pst.message}
+                        </span>
+                    </td>
+                    <td class="pane" style="text-align:right;">
+                        <a href="${rootURL}/${f.failedSinceRun.url}" class="model-link inside">${f.age}</a>
+                    </td>
+                </tr>
+            </j:forEach>
+        </table>
+    </j:if>
 
   <j:if test="${it.totalCount!=0}">
     <h2>${%All Tests}</h2>
